@@ -3,6 +3,7 @@
 import sys
 import spotipy
 import spotipy.util as util
+from random import randint
 
 def main():
     username = "bchapen"
@@ -13,10 +14,24 @@ def main():
         print("Cool we authenticated")
 
         genres = sp.recommendation_genre_seeds()['genres']
-        genreWanted = genres[4]
+        print (genres)
+        genreWanted = 'pop'
         print (genreWanted)
         
-        returnedSongs = list(generateSongsForAGenre(sp, genreWanted, 10))
+        #For more popular genres, 5k shouldn't be too much of a problem, takes probably about a minute. Even 10k is feasible. Using multiple computers, could be very short 
+        # data collection for a lot of genres. Sweet spot is probably around 5k songs per category.
+        # For less popular genres, can run into problems around 1.5K, so have to be careful
+        # Country took around 2 minutes for 5000 examples
+        # Pop took around 2 minutes for 7k examples
+
+        # I don't know if 10k examples per final genre is the best of ideas, but it could be fruitful to create final genres for the training using k-means clustering
+        # Basic idea would be to gather as many samples of data as possible for each genre, then get all of their data and then cluster all of it with the 
+        # final count of genres we want being the amount of clusters. If the data is truly unique then there should be no issue with this, and it will put like genres 
+        # in the same clusters.
+        # If we're going to do this, we will likely need to reduce the size of the data using SVD, otherwise it'll take ages to run properly
+
+        # TODO check if the current method detracts from the uniqueness of the songs returned.
+        returnedSongs = list(generateSongsForAGenre(sp, genreWanted, 100))
         print (returnedSongs)
         checkingTrack = 9
         trackChecked = sp.track(returnedSongs[checkingTrack])
@@ -36,9 +51,15 @@ def generateSongsForAGenre(sp, genre, upperLimit):
     genre=[genre]
 
     # if limit is set too high this loop might take a long time to run, I don't know yet.
+    counter = 0
     while len(generatedSongsFinalSet) < upperLimit:
         # the raw track data returned by spotify
-        rawTracks = sp.recommendations(seed_genres=genre, limit=100)['tracks']
+        if counter > 0:
+            # Removes and returns a random element from the set, to be used as the track seed for the next iteration.
+            trackSeed = [generatedSongsFinalSet.pop()]
+            rawTracks = sp.recommendations(seed_genres=genre, seed_tracks=trackSeed, limit=100)['tracks']
+        else:
+            rawTracks = sp.recommendations(seed_genres=genre, limit=100)['tracks']
 
         # Iterate through the raw track data and extract the IDs of each of the tracks, adding them to the set.
         for i in range(0, len(rawTracks)):
@@ -49,6 +70,10 @@ def generateSongsForAGenre(sp, genre, upperLimit):
         if placeholderTracker:
             generatedSongsFinalSet.remove('placeholder')
             placeholderTracker = False
+            
+
+        counter += 1
+        print (len(generatedSongsFinalSet))
 
     return generatedSongsFinalSet
 
@@ -97,6 +122,9 @@ def oneRecommendationPerGenre(sp):
 # Can find a list of tracks per a specific genre using the recommendations function. 
 # Can use this in tandem with getting genres from artists to generate large amounts of tracks per genre that I want.
 # Can get an audio analysis for tracks using the API, need to find this function in spotipy.
+# https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-analysis/ - audio analysis page - lots of good shit here
+# https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/ - audio features page, even more amazing shit here
+# I legit thought the hardest part of this would be the data colleciton, 
 
 
 if __name__ == '__main__':
