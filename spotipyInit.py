@@ -15,8 +15,9 @@ def main():
 
         genres = sp.recommendation_genre_seeds()['genres']
         print (genres)
-        genreWanted = 'pop'
-        print (genreWanted)
+        print (len(genres))
+        #genreWanted = 'pop'
+        #print (genreWanted)
         
         #For more popular genres, 5k shouldn't be too much of a problem, takes probably about a minute. Even 10k is feasible. Using multiple computers, could be very short 
         # data collection for a lot of genres. Sweet spot is probably around 5k songs per category.
@@ -31,11 +32,34 @@ def main():
         # If we're going to do this, we will likely need to reduce the size of the data using SVD, otherwise it'll take ages to run properly
 
         # TODO check if the current method detracts from the uniqueness of the songs returned.
-        returnedSongs = list(generateSongsForAGenre(sp, genreWanted, 100))
-        print (returnedSongs)
+        returnedSongs = list(generateSongsForAGenre(sp, 'pop', 100))
+        #print (returnedSongs)
         checkingTrack = 9
         trackChecked = sp.track(returnedSongs[checkingTrack])
-        print (trackChecked['name'])
+        #print (trackChecked['name'])
+
+        ## Find Mac Demarcos still together - example of searching for a specific song.
+        stillTogether = sp.search("Still Together", limit=1, type='track')
+        #print (stillTogether)
+        stillTogetherID = stillTogether['tracks']['items'][0]['id']
+        print (stillTogetherID)
+
+        getAudioFeaturesAndAnalysis(sp, stillTogetherID)
+
+
+
+def getAudioFeaturesAndAnalysis(sp, trackID):
+    analysis = sp.audio_analysis(trackID)
+    features = sp.audio_features(trackID)
+
+    del analysis['track']['codestring']
+    del analysis['track']['echoprintstring']
+    del analysis['track']['synchstring']
+    del analysis['track']['rhythmstring']
+
+    print (analysis)
+    print ("\n\n\n")
+    #print (features)
 
         
 # TODO add some sort of limiter on the loop if the limit is less than 100? idk exactly how this will work. I might honestly just instead have the limit be the 
