@@ -11,11 +11,11 @@ def main():
     sp = spotipy.Spotify(auth=token)
     
     if token:
-        print("Cool we authenticated")
+        #print("Cool we authenticated")
 
-        genres = sp.recommendation_genre_seeds()['genres']
-        print (genres)
-        print (len(genres))
+        #genres = sp.recommendation_genre_seeds()['genres']
+        #print (genres)
+        #print (len(genres))
         #genreWanted = 'pop'
         #print (genreWanted)
         
@@ -39,15 +39,15 @@ def main():
         #print (trackChecked['name'])
 
         ## Find Mac Demarcos still together - example of searching for a specific song.
-        stillTogether = sp.search("Still Together", limit=1, type='track')
+        searchedSong = sp.search("Still Together", limit=1, type='track')
         #print (stillTogether)
-        stillTogetherID = stillTogether['tracks']['items'][0]['id']
-        print (stillTogetherID)
+        searchedSongID = searchedSong['tracks']['items'][0]['id']
+        print (searchedSongID)
 
-        getAudioFeaturesAndAnalysis(sp, stillTogetherID)
+        getAudioFeaturesAndAnalysis(sp, searchedSongID)
 
 
-
+# Mostly just for human consumption of songs.
 def getAudioFeaturesAndAnalysis(sp, trackID):
     analysis = sp.audio_analysis(trackID)
     features = sp.audio_features(trackID)
@@ -57,8 +57,17 @@ def getAudioFeaturesAndAnalysis(sp, trackID):
     del analysis['track']['synchstring']
     del analysis['track']['rhythmstring']
 
-    print (analysis)
-    print ("\n\n\n")
+    anaBars = analysis['bars']
+    anaBeats = analysis['beats']
+    anaSections = analysis['sections']
+    anaSegments = analysis['segments']
+    anaTatums = analysis['tatums']
+
+    for bar in anaBars:
+        print ("Start: %5f, Duration: %5f, Confidence: %5f" % (bar['start'], bar['duration'], bar['confidence']))
+
+    #print (analysis)
+    #print ("\n\n\n")
     #print (features)
 
         
@@ -97,7 +106,7 @@ def generateSongsForAGenre(sp, genre, upperLimit):
             
 
         counter += 1
-        print (len(generatedSongsFinalSet))
+        #print (len(generatedSongsFinalSet))
 
     return generatedSongsFinalSet
 
