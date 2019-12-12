@@ -1,0 +1,17 @@
+Start: 0.000000, Duration: 21.787600, Confidence: 1.000000, Loudness: -18.629000, Tempo: 140.424000, Key: 5, Mode: 1, Time Signature: 3
+Start: 21.787600, Duration: 7.133830, Confidence: 0.401000, Loudness: -14.526000, Tempo: 141.281000, Key: 3, Mode: 1, Time Signature: 3
+Start: 28.921430, Duration: 20.375110, Confidence: 0.339000, Loudness: -15.248000, Tempo: 144.224000, Key: 10, Mode: 1, Time Signature: 4
+Start: 49.296540, Duration: 10.603840, Confidence: 0.927000, Loudness: -17.957000, Tempo: 141.898000, Key: 3, Mode: 1, Time Signature: 4
+Start: 59.900380, Duration: 19.041270, Confidence: 0.873000, Loudness: -14.966000, Tempo: 141.965000, Key: 7, Mode: 0, Time Signature: 4
+Start: 78.941650, Duration: 23.944290, Confidence: 0.580000, Loudness: -10.503000, Tempo: 140.989000, Key: 0, Mode: 0, Time Signature: 4
+Start: 102.885940, Duration: 15.725260, Confidence: 1.000000, Loudness: -17.456000, Tempo: 140.609000, Key: 3, Mode: 1, Time Signature: 4
+Start: 118.611200, Duration: 17.167580, Confidence: 0.882000, Loudness: -13.180000, Tempo: 140.841000, Key: 0, Mode: 0, Time Signature: 4
+Start: 135.778790, Duration: 47.851280, Confidence: 0.239000, Loudness: -7.267000, Tempo: 142.320000, Key: 0, Mode: 0, Time Signature: 4
+Start: 183.630070, Duration: 12.925540, Confidence: 0.816000, Loudness: -9.488000, Tempo: 146.842000, Key: 9, Mode: 1, Time Signature: 4
+Start: 196.555610, Duration: 7.043070, Confidence: 0.608000, Loudness: -12.020000, Tempo: 154.598000, Key: 7, Mode: 0, Time Signature: 4
+Start: 203.598680, Duration: 13.990050, Confidence: 0.764000, Loudness: -11.775000, Tempo: 150.503000, Key: 10, Mode: 1, Time Signature: 4
+Start: 217.588720, Duration: 30.273820, Confidence: 0.721000, Loudness: -6.663000, Tempo: 150.903000, Key: 10, Mode: 1, Time Signature: 4
+Start: 247.862540, Duration: 41.509650, Confidence: 0.191000, Loudness: -7.005000, Tempo: 137.899000, Key: 8, Mode: 1, Time Signature: 4
+Start: 289.372190, Duration: 7.623170, Confidence: 0.340000, Loudness: -9.386000, Tempo: 142.632000, Key: 3, Mode: 1, Time Signature: 4
+Start: 296.995360, Duration: 12.082590, Confidence: 0.338000, Loudness: -7.663000, Tempo: 139.472000, Key: 0, Mode: 0, Time Signature: 4
+Start: 309.077940, Duration: 45.242060, Confidence: 0.835000, Loudness: -21.676000, Tempo: 135.836000, Key: 3, Mode: 1, Time Signature: 4

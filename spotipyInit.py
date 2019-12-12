@@ -4,6 +4,7 @@ import sys
 import spotipy
 import spotipy.util as util
 from random import randint
+import math
 
 def main():
     username = "bchapen"
@@ -32,19 +33,83 @@ def main():
         # If we're going to do this, we will likely need to reduce the size of the data using SVD, otherwise it'll take ages to run properly
 
         # TODO check if the current method detracts from the uniqueness of the songs returned.
-        returnedSongs = list(generateSongsForAGenre(sp, 'pop', 100))
+        trackLimit = 3000
+        genre = "country"
+        returnedSongs = list(generateSongsForAGenre(sp, genre, trackLimit))
         #print (returnedSongs)
-        checkingTrack = 9
-        trackChecked = sp.track(returnedSongs[checkingTrack])
+        #checkingTrack = 9
+        #trackChecked = sp.track(returnedSongs[checkingTrack])
         #print (trackChecked['name'])
 
         ## Find Mac Demarcos still together - example of searching for a specific song.
-        searchedSong = sp.search("Still Together", limit=1, type='track')
+        #searchedSong = sp.search("Bohemian Rhapsody", limit=1, type='track')
         #print (stillTogether)
-        searchedSongID = searchedSong['tracks']['items'][0]['id']
-        print (searchedSongID)
+        #searchedSongID = searchedSong['tracks']['items'][0]['id']
+        #print (searchedSongID)
 
-        getAudioFeaturesAndAnalysis(sp, searchedSongID)
+        #getAudioFeaturesAndAnalysis(sp, searchedSongID)
+
+        dataCrunchingOnTracks(sp, returnedSongs)
+
+
+
+
+# Ideas for data points (aside from the ones that the data presents immediately)
+# Include confidence values in things
+# Sections: Number of sections, something w their duration, loudness values (range, mean, median, etc)
+# tempo(changes, avg, mean, amount of time on each), key (changes etc), mode (mainly the amount of switches),
+# TS (changes and number of changes)
+
+#Segments: Use stuff with the timbre of what's used, group the timbre's together somehow, since 
+# similar timbre vectors will be similar instruments.
+# Pitches used too, though harder
+
+# Bars, Beats, Tatums: Harder to use but still interesting i guess.
+# Other than all of that, use pretty much all of what the features give. 
+
+
+
+# Get data on a large number of songs so that we can educate ourselves on what data points to use.
+# This data includes time, # of (sections, segments, tatums, bars, beats)
+def dataCrunchingOnTracks(sp, idList):
+    # All of these just count the occurances of these events within each song.
+    barCounts = []
+    beatCounts = []
+    secCounts = []
+    segCounts = []
+    tatumCount = []
+
+    # get all of the data from each of the songs
+    count = 0
+    for id in idList:
+        analysis = sp.audio_analysis(id)
+
+        barCounts.append(len(analysis['bars']))
+        beatCounts.append(len(analysis['beats']))
+        secCounts.append(len(analysis['sections']))
+        segCounts.append(len(analysis['segments']))
+        tatumCount.append(len(analysis['tatums']))
+
+        count += 1
+
+        if count % 100 == 0:
+            print (count)
+
+    print("Bars:\nMin: %2i\nMax: %2i\nAverage: %2f\n\n" % (min(barCounts), max(barCounts), average(barCounts)))
+    print("Beats:\nMin: %2i\nMax: %2i\nAverage: %2f\n\n" % (min(beatCounts), max(beatCounts), average(beatCounts)))
+    print("Sections:\nMin: %2i\nMax: %2i\nAverage: %2f\n\n" % (min(secCounts), max(secCounts), average(secCounts)))
+    print("Segments:\nMin: %2i\nMax: %2i\nAverage: %2f\n\n" % (min(segCounts), max(segCounts), average(segCounts)))
+    print("Tatums:\nMin: %2i\nMax: %2i\nAverage: %2f\n\n" % (min(tatumCount), max(tatumCount), average(tatumCount)))
+
+
+def average(list):
+    s = sum(list)
+
+    return s / len(list)
+
+# Break down the data into what we actually want to use as data points. Remember that every song has to have the same number of data points no matter what.
+def generateNeededDataPerTrack(sp, idList):
+    pass
 
 
 # Mostly just for human consumption of songs.
@@ -63,8 +128,41 @@ def getAudioFeaturesAndAnalysis(sp, trackID):
     anaSegments = analysis['segments']
     anaTatums = analysis['tatums']
 
+    bars = open("sampleBars.txt", 'w')
     for bar in anaBars:
-        print ("Start: %5f, Duration: %5f, Confidence: %5f" % (bar['start'], bar['duration'], bar['confidence']))
+        bars.write("Start: %2f, Duration: %2f, Confidence: %2f\n" % (bar['start'], bar['duration'], bar['confidence']))
+    bars.close()
+
+    beats = open("sampleBeats.txt", 'w')
+    for beat in anaBeats:
+        beats.write("Start: %2f, Duration: %2f, Confidence: %2f\n" % (beat['start'], beat['duration'], beat['confidence']))
+    beats.close()
+
+    secs = open("sampleSections.txt", 'w')
+    for sec in anaSections:
+        secs.write("Start: %2f, Duration: %2f, Confidence: %2f, Loudness: %2f, Tempo: %2f, Key: %1i, Mode: %1i, Time Signature: %1i\n" % 
+                   (sec['start'], sec['duration'], sec['confidence'], sec['loudness'], sec['tempo'], sec['key'], sec['mode'], sec['time_signature'], ))
+    secs.close()
+
+    segs = open("sampleSegments.txt", 'w')
+    for seg in anaSegments:
+        segs.write("Start: %2f, Duration: %2f, Confidence: %2f, Loudness Start: %2f, Loudness Max Time: %2f, Loudness Max: %2f\nPitches: " % 
+                  (seg['start'], seg['duration'], seg['confidence'], seg['loudness_start'], seg['loudness_max_time'], seg['loudness_max']))
+        for i in seg['pitches']:
+            segs.write(str(i) + ", ")
+        segs.write("\nTimre: ")
+        for i in seg['timbre']:
+            segs.write(str(i) + ", ")
+        segs.write("\n\n")        
+
+    segs.close()
+
+    tats = open("sampleTatums.txt", 'w')
+    for tat in anaTatums:
+        tats.write("Start: %2f, Duration: %2f, Confidence: %2f\n" % (tat['start'], tat['duration'], tat['confidence']))
+    tats.close()
+
+    
 
     #print (analysis)
     #print ("\n\n\n")
@@ -106,7 +204,7 @@ def generateSongsForAGenre(sp, genre, upperLimit):
             
 
         counter += 1
-        #print (len(generatedSongsFinalSet))
+        print (len(generatedSongsFinalSet))
 
     return generatedSongsFinalSet
 
