@@ -14,9 +14,9 @@ def main():
     if token:
         #print("Cool we authenticated")
 
-        #genres = sp.recommendation_genre_seeds()['genres']
-        #print (genres)
-        #print (len(genres))
+        # this is the final list of all genres to be used.
+        genres = ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'classical', 'country', 'death-metal', 'disco', 'dubstep', 'edm', 'electronic', 'emo', 'folk', 'funk', 'gospel', 'goth', 'grunge', 'hard-rock', 'heavy-metal', 'hip-hop', 'holidays', 'indian', 'indie', 'indie-pop', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'metal', 'metalcore', 'opera', 'piano', 'pop', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 'reggae', 'rock', 'rock-n-roll', 'romance', 'salsa', 'samba', 'ska', 'soul', 'spanish', 'study', 'summer', 'synth-pop', 'tango', 'techno', 'turkish']
+        print (len(genres))
         #genreWanted = 'pop'
         #print (genreWanted)
         
@@ -33,9 +33,20 @@ def main():
         # If we're going to do this, we will likely need to reduce the size of the data using SVD, otherwise it'll take ages to run properly
 
         # TODO check if the current method detracts from the uniqueness of the songs returned.
-        trackLimit = 3000
-        genre = "country"
-        returnedSongs = list(generateSongsForAGenre(sp, genre, trackLimit))
+        trackLimit = 2000
+        
+        for genre in genres:
+            currentGenreSongs = list(generateSongsForAGenre(sp, genre, trackLimit))
+
+            genreIDs = open("songIDs\\" + genre + "IDs.txt", 'w')
+            for track in currentGenreSongs:
+                genreIDs.write(track + "\n")
+
+
+
+
+
+        #returnedSongs = list(generateSongsForAGenre(sp, genre, trackLimit))
         #print (returnedSongs)
         #checkingTrack = 9
         #trackChecked = sp.track(returnedSongs[checkingTrack])
@@ -49,7 +60,11 @@ def main():
 
         #getAudioFeaturesAndAnalysis(sp, searchedSongID)
 
-        dataCrunchingOnTracks(sp, returnedSongs)
+        #dataCrunchingOnTracks(sp, returnedSongs)
+
+        #classicalSongs = open('classicalIDs.txt', 'w')
+        #for i in returnedSongs:
+        #    classicalSongs.write(i + "\n")
 
 
 
@@ -92,7 +107,7 @@ def dataCrunchingOnTracks(sp, idList):
 
         count += 1
 
-        if count % 100 == 0:
+        if count % 10 == 0:
             print (count)
 
     print("Bars:\nMin: %2i\nMax: %2i\nAverage: %2f\n\n" % (min(barCounts), max(barCounts), average(barCounts)))
