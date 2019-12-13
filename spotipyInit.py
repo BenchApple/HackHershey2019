@@ -6,17 +6,18 @@ import spotipy.util as util
 from random import randint
 import math
 
+username = "bchapen"
+token = util.prompt_for_user_token(username,scope = 'user-top-read',client_id='407f7f8b0c314f42816264be391af790',client_secret='765d0a94dbec49e4b8a379ebe642404d',redirect_uri='https://example.com/callback')
+
 def main():
-    username = "bchapen"
-    token = util.prompt_for_user_token(username,scope = 'user-top-read',client_id='407f7f8b0c314f42816264be391af790',client_secret='765d0a94dbec49e4b8a379ebe642404d',redirect_uri='https://example.com/callback')
     sp = spotipy.Spotify(auth=token)
     
     if token:
         #print("Cool we authenticated")
 
         # this is the final list of all genres to be used.
-        genres = ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'classical', 'country', 'death-metal', 'disco', 'dubstep', 'edm', 'electronic', 'emo', 'folk', 'funk', 'gospel', 'goth', 'grunge', 'hard-rock', 'heavy-metal', 'hip-hop', 'holidays', 'indian', 'indie', 'indie-pop', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'metal', 'metalcore', 'opera', 'piano', 'pop', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 'reggae', 'rock', 'rock-n-roll', 'romance', 'salsa', 'samba', 'ska', 'soul', 'spanish', 'study', 'summer', 'synth-pop', 'tango', 'techno', 'turkish']
-        print (len(genres))
+        #genres = ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'classical', 'country', 'death-metal', 'disco', 'dubstep', 'edm', 'electronic', 'emo', 'folk', 'funk', 'gospel', 'goth', 'grunge', 'hard-rock', 'heavy-metal', 'hip-hop', 'holidays', 'indian', 'indie', 'indie-pop', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'metal', 'metalcore', 'opera', 'piano', 'pop', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 'reggae', 'rock', 'rock-n-roll', 'romance', 'salsa', 'samba', 'ska', 'soul', 'spanish', 'study', 'summer', 'synth-pop', 'tango', 'techno', 'turkish']
+        #print (len(genres))
         #genreWanted = 'pop'
         #print (genreWanted)
         
@@ -33,6 +34,7 @@ def main():
         # If we're going to do this, we will likely need to reduce the size of the data using SVD, otherwise it'll take ages to run properly
 
         # TODO check if the current method detracts from the uniqueness of the songs returned.
+        '''
         trackLimit = 2000
         
         for genre in genres:
@@ -41,10 +43,7 @@ def main():
             genreIDs = open("songIDs\\" + genre + "IDs.txt", 'w')
             for track in currentGenreSongs:
                 genreIDs.write(track + "\n")
-
-
-
-
+        '''
 
         #returnedSongs = list(generateSongsForAGenre(sp, genre, trackLimit))
         #print (returnedSongs)
@@ -53,12 +52,21 @@ def main():
         #print (trackChecked['name'])
 
         ## Find Mac Demarcos still together - example of searching for a specific song.
-        #searchedSong = sp.search("Bohemian Rhapsody", limit=1, type='track')
+        searchedSong = sp.search("Bohemian Rhapsody", limit=1, type='track')
         #print (stillTogether)
-        #searchedSongID = searchedSong['tracks']['items'][0]['id']
-        #print (searchedSongID)
+        searchedSongID = searchedSong['tracks']['items'][0]['id']
+        print (searchedSongID)
 
         #getAudioFeaturesAndAnalysis(sp, searchedSongID)
+
+        features = sp.audio_features(searchedSongID)[0]
+
+        feat = [features['duration_ms'], features['key'], features['mode'], features['time_signature'], 
+                features['acousticness'], features['danceability'], features['energy'], 
+                features['instrumentalness'], features['liveness'], features['loudness'], 
+                features['speechiness'], features['valence'], features['tempo']]
+
+        print (feat)
 
         #dataCrunchingOnTracks(sp, returnedSongs)
 
@@ -67,6 +75,8 @@ def main():
         #    classicalSongs.write(i + "\n")
 
 
+def verifyToken(sp, scope, token):
+    pass
 
 
 # Ideas for data points (aside from the ones that the data presents immediately)
