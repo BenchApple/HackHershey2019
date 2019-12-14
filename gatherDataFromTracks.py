@@ -322,7 +322,7 @@ def combineData(sp, trackID):
 def main():
     
     # place the analytics in a text document, in the order of how they appear in the genres array and the txt files
-    data = open("allData.txt", 'w')
+    data = open("hipHopOn.txt", 'w')
     for genre in genres:
         if genre in ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'classical', 'country', 'death-metal', 'disco', 'dubstep', 'edm', 'electronic', 'emo', 'folk', 'funk', 'gospel', 'goth', 'grunge', 'hard-rock', 'heavy-metal']:
             continue
