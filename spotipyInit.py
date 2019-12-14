@@ -94,6 +94,13 @@ def verifyToken(sp, scope, token):
 
 
 
+'''
+based on the genre that you have, find more songs of a similar genre 
+use the api for this - easy
+
+
+'''
+
 # Get data on a large number of songs so that we can educate ourselves on what data points to use.
 # This data includes time, # of (sections, segments, tatums, bars, beats)
 def dataCrunchingOnTracks(sp, idList):

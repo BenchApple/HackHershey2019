@@ -8,6 +8,8 @@ import random
 token = spotipyInit.token
 sp = spotipy.Spotify(auth=token)
 
+genres = ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'classical', 'country', 'death-metal', 'disco', 'dubstep', 'edm', 'electronic', 'emo', 'folk', 'funk', 'gospel', 'goth', 'grunge', 'hard-rock', 'heavy-metal', 'hip-hop', 'holidays', 'indian', 'indie', 'indie-pop', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'metal', 'metalcore', 'opera', 'piano', 'pop', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 'reggae', 'rock', 'rock-n-roll', 'romance', 'salsa', 'samba', 'ska', 'soul', 'spanish', 'study', 'summer', 'synth-pop', 'tango', 'techno', 'turkish']
+
 ### all of the data that i want to collect from each track ###
 
 '''
@@ -16,7 +18,8 @@ sp = spotipy.Spotify(auth=token)
 
 From Sections
 min loudness, max loudness, avg loudness
-volume swell factor - is there a distinct swell in the volume? - use the volume in tandem with the loudness to create a "graphic" representation and use the derivative and calc stuff to determine this
+volume swell factor - is there a distinct swell in the volume? - use the volume in tandem with the loudness to create a "graphic" 
+representation and use the derivative and calc stuff to determine this
 min tempo, max tempo, avg tempo
 tempo swell factor - same as volume
 # of distinct keys - # of key changes, average key, longest run, shortest run
@@ -87,6 +90,7 @@ def tatumAnalysis(tatums):
 
 
 # I'm pretty sure that this section is done, need to know soon if there are any other ideas for data from here.
+# This is all of the analyisis and data collection for the sections
 def sectionAnalysis(sections):
     sectionCount = len(sections)
 
@@ -168,7 +172,6 @@ def sectionAnalysis(sections):
         keys.add(k)
         timeSigs.add(ts)
 
-        # TODO add the provisions for the shortest and longest runs of a key or ts or mode
         if k == prevKey:
             currentKeyRun += 1
         if m == prevMode:
@@ -188,6 +191,7 @@ def sectionAnalysis(sections):
         tempo.append(t)
         times.append(section['start'])
 
+        # All of these deal with the key switches and key runs
         if k != prevKey:
             keySwitches += 1
             prevKey = k
@@ -207,6 +211,7 @@ def sectionAnalysis(sections):
                 shortestTSRun = currentTSRun
             currentTSRun = 0
 
+    # Return all of the data that was created.
     toRet = [sectionCount, sectionConfSum, loudnessSum, tempoSum, keySum, keyConfSum, modeSum, modeConfSum,
             tsSum, tsConfSum, sectionConfSum/sectionCount, loudnessSum/sectionCount, tempoSum/sectionCount,
             keySum/sectionCount, keySum/sectionCount, keyConfSum/sectionCount, modeSum/sectionCount,
@@ -217,13 +222,6 @@ def sectionAnalysis(sections):
     return toRet
 
 
-
-
-    
-
-
-
-
 def segmentAnalysis(segments):
     segmentCount = len(segments)
 
@@ -231,20 +229,29 @@ def segmentAnalysis(segments):
     for segment in segments:
         segmentConfSum += segment['confidence']
 
+    # Get 100 random pitch vectors and 100 random timbre vectors
+    pitches = []
+    timbres = []
+    datasetsToCollect = 200
+    step = int(segmentCount / datasetsToCollect) - 1
+    for i in range(0, datasetsToCollect):
+        pitchToCollect = random.randint(step*i, (step+1)*i)
+        timbreToCollect = random.randint(step*i, (step+1)*i)
+
+        # Stores the pitches and timbres associated with this specific boy.
+        pitch = segments[pitchToCollect]['pitches']
+        timbre = segments[timbreToCollect]['timbre']
+
+        for i in range(0, 12):
+            pitches.append(pitch[i])
+            timbres.append(timbre[i])
 
 
+    # Return everything here.
+    return [segmentConfSum / segmentCount, segmentCount, pitches, timbres]
 
 
-
-
-
-
-    return [segmentConfSum / segmentCount, segmentCount]
-
-
-def main():
-    pass
-
+# the ordering here is really quite important
 def analyzeTrack(sp, trackID):
     analysis = sp.audio_analysis(trackID)
     features = sp.audio_features(trackID)
@@ -255,14 +262,61 @@ def analyzeTrack(sp, trackID):
     segments = analysis['segments']
     tatums = analysis['tatums']
 
-    
-    
+    finalAnalysis = []
 
+    for i in barsAnalysis(bars):
+        finalAnalysis.append(i)
 
+    for i in beatAnalyis(beats):
+        finalAnalysis.append(i)
 
+    for i in sectionAnalysis(section):
+        finalAnalysis.append(i)
 
+    for i in segmentAnalysis(segments):
+        finalAnalysis.append(i)
 
-    
+    for i in tatumAnalysis(tatums):
+        finalAnalysis.append(i)
+
+    return finalAnalysis
+
+# Returns all of the features of a track as stated by the spotify api
+def featuresTrack(sp, trackID):
+    features = sp.audio_features(trackID)[0]
+
+    feat = [features['duration_ms'], features['key'], features['mode'], features['time_signature'], 
+            features['acousticness'], features['danceability'], features['energy'], 
+            features['instrumentalness'], features['liveness'], features['loudness'], 
+            features['speechiness'], features['valence'], features['tempo']]
+
+    return feat
+
+def combineData(sp, trackID):
+    features = featuresTrack(sp, trackID)
+    analyis = analyzeTrack(sp, trackID)
+
+    final = []
+
+    for i in features:
+        final.append(i)
+    for i in analyis:
+        final.append(i)
+
+    return final
+
+def main():
+    # place the analytics in a text document, in the order of how they appear in the genres array and the txt files
+    data = open("allData.txt", 'w')
+    for genre in genres:
+        cur = open(genre+ "IDs.txt", 'r')
+        nextID = cur.readline().rstrip("\n")
+        dataForThisTrack = combineData(sp, nextID)
+        
+        for i in dataForThisTrack:
+            data.write(str(i) + " ")
+        data.write("\n")
+
 
 
 if __name__ == "__main__":
