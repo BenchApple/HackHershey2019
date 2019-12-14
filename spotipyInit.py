@@ -16,7 +16,7 @@ def main():
         #print("Cool we authenticated")
 
         # this is the final list of all genres to be used.
-        #genres = ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'classical', 'country', 'death-metal', 'disco', 'dubstep', 'edm', 'electronic', 'emo', 'folk', 'funk', 'gospel', 'goth', 'grunge', 'hard-rock', 'heavy-metal', 'hip-hop', 'holidays', 'indian', 'indie', 'indie-pop', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'metal', 'metalcore', 'opera', 'piano', 'pop', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 'reggae', 'rock', 'rock-n-roll', 'romance', 'salsa', 'samba', 'ska', 'soul', 'spanish', 'study', 'summer', 'synth-pop', 'tango', 'techno', 'turkish']
+        genres = ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'classical', 'country', 'death-metal', 'disco', 'dubstep', 'edm', 'electronic', 'emo', 'folk', 'funk', 'gospel', 'goth', 'grunge', 'hard-rock', 'heavy-metal', 'hip-hop', 'holidays', 'indian', 'indie', 'indie-pop', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'metal', 'metalcore', 'opera', 'piano', 'pop', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 'reggae', 'rock', 'rock-n-roll', 'romance', 'salsa', 'samba', 'ska', 'soul', 'spanish', 'study', 'summer', 'synth-pop', 'tango', 'techno', 'turkish']
         #print (len(genres))
         #genreWanted = 'pop'
         #print (genreWanted)
