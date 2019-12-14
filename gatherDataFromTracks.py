@@ -4,11 +4,15 @@ import spotipy
 import spotipyInit
 import math
 import random
+import os
+import gc
+import spotipy.util as util
 
 token = spotipyInit.token
 sp = spotipy.Spotify(auth=token)
 
 genres = ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'classical', 'country', 'death-metal', 'disco', 'dubstep', 'edm', 'electronic', 'emo', 'folk', 'funk', 'gospel', 'goth', 'grunge', 'hard-rock', 'heavy-metal', 'hip-hop', 'holidays', 'indian', 'indie', 'indie-pop', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'metal', 'metalcore', 'opera', 'piano', 'pop', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 'reggae', 'rock', 'rock-n-roll', 'romance', 'salsa', 'samba', 'ska', 'soul', 'spanish', 'study', 'summer', 'synth-pop', 'tango', 'techno', 'turkish']
+
 
 ### all of the data that i want to collect from each track ###
 
@@ -126,7 +130,7 @@ def sectionAnalysis(sections):
 
     currentKeyRun = 0
     currentModeRun = 0
-    curretTSRun = 0
+    currentTSRun = 0
 
     loudness = []
     tempo = []
@@ -144,7 +148,7 @@ def sectionAnalysis(sections):
         l = section['loudness']
         t = section['tempo']
         k = section['key']
-        kConf = section['key_confiendence']
+        kConf = section['key_confidence']
         m = section['mode']
         mConf = section['mode_confidence']
         ts = section['time_signature']
@@ -177,13 +181,13 @@ def sectionAnalysis(sections):
         if m == prevMode:
             currentModeRun += 1
         if ts == prevTS:
-            curretTSRun += 1
+            currentTSRun += 1
 
         if currentKeyRun > longestKeyRun:
             longestKeyRun = currentKeyRun
         if currentModeRun > longestModeRun:
             longestKeyRun = currentModeRun
-        if curretTSRun > longestTSRun:
+        if currentTSRun > longestTSRun:
             longestTSRun = currentTSRun
         
 
@@ -232,15 +236,19 @@ def segmentAnalysis(segments):
     # Get 100 random pitch vectors and 100 random timbre vectors
     pitches = []
     timbres = []
-    datasetsToCollect = 200
+    datasetsToCollect = 100
     step = int(segmentCount / datasetsToCollect) - 1
     for i in range(0, datasetsToCollect):
         pitchToCollect = random.randint(step*i, (step+1)*i)
         timbreToCollect = random.randint(step*i, (step+1)*i)
 
         # Stores the pitches and timbres associated with this specific boy.
-        pitch = segments[pitchToCollect]['pitches']
-        timbre = segments[timbreToCollect]['timbre']
+        try:
+            pitch = segments[pitchToCollect]['pitches']
+            timbre = segments[timbreToCollect]['timbre']
+        except:
+            pitch = [0,0,0,0,0,0,0,0,0,0,0,0]
+            timre = [0,0,0,0,0,0,0,0,0,0,0,0]
 
         for i in range(0, 12):
             pitches.append(pitch[i])
@@ -248,7 +256,13 @@ def segmentAnalysis(segments):
 
 
     # Return everything here.
-    return [segmentConfSum / segmentCount, segmentCount, pitches, timbres]
+    toRet = [segmentConfSum / segmentCount, segmentCount]
+    for i in pitches:
+        toRet.append(i)
+    for i in timbres:
+        toRet.append(i)
+
+    return toRet
 
 
 # the ordering here is really quite important
@@ -270,7 +284,7 @@ def analyzeTrack(sp, trackID):
     for i in beatAnalyis(beats):
         finalAnalysis.append(i)
 
-    for i in sectionAnalysis(section):
+    for i in sectionAnalysis(sections):
         finalAnalysis.append(i)
 
     for i in segmentAnalysis(segments):
@@ -306,16 +320,45 @@ def combineData(sp, trackID):
     return final
 
 def main():
+    
     # place the analytics in a text document, in the order of how they appear in the genres array and the txt files
     data = open("allData.txt", 'w')
     for genre in genres:
-        cur = open(genre+ "IDs.txt", 'r')
-        nextID = cur.readline().rstrip("\n")
-        dataForThisTrack = combineData(sp, nextID)
+        if genre in ['alt-rock', 'alternative', 'anime', 'black-metal', 'bluegrass', 'blues']:
+            continue
+
+        username = "bchapen"
+        token = util.prompt_for_user_token(username,scope = 'user-top-read',client_id='407f7f8b0c314f42816264be391af790',client_secret='765d0a94dbec49e4b8a379ebe642404d',redirect_uri='https://example.com/callback')
+
+        sp = spotipy.Spotify(auth=token)
+
+
+        cur = open("songIDs/" + genre + "IDs.txt", 'r')
+        lines = cur.readlines()
+        count = 0
+
+        for line in lines:
+            line = line.rstrip("\n")
+            
+            dataForThisTrack = combineData(sp, line)
         
-        for i in dataForThisTrack:
-            data.write(str(i) + " ")
-        data.write("\n")
+            for i in dataForThisTrack:
+                data.write(str(i) + " ")
+            data.write("\n")
+
+            del dataForThisTrack
+            gc.collect()
+
+            count += 1
+            print (genre + " " + str(count))
+            if count == 500:
+                print ("on to the next genre")
+                print 
+                break
+
+            
+        
+        
 
 
 
